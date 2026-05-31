@@ -141,7 +141,7 @@
     background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.025));backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
     border:var(--glass-rim);box-shadow:var(--glass-edge),0 28px 56px -22px rgba(0,0,0,.82);transition:border-color .3s var(--e-out),box-shadow .3s var(--e-out)}
   .nav-field:focus-within{border-color:rgba(227,192,122,.55);box-shadow:var(--glass-edge),0 0 0 1px rgba(227,192,122,.5),0 0 38px -6px var(--gold-glow)}
-  .nav-cap{font-family:var(--latin);font-style:italic;font-size:15px;color:var(--muted);margin-block-end:10px;letter-spacing:.01em}
+  .nav-cap{font-family:var(--latin);font-style:italic;font-size:17px;color:rgba(227,192,122,.82);margin-block-end:11px;letter-spacing:.015em}
   .nav-input-wrap{position:relative;flex:1;min-width:0;display:flex;align-items:center}
   .nav-field input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:16.5px;font-weight:400;padding-block:15px;text-align:start}
   .nav-field input::placeholder{color:transparent}
@@ -249,8 +249,8 @@
     filter:drop-shadow(0 0 18px rgba(227,192,122,.3));transition:--p 1100ms var(--e-out)}
   /* gold marker that travels to the reading — makes it a measured dial, not a loader */
   .needle{position:absolute;inset:0;transform:rotate(var(--mark,0deg));transition:transform 1100ms var(--e-out)}
-  .needle::after{content:"";position:absolute;inset-block-start:1px;inset-inline-start:50%;width:9px;height:9px;border-radius:50%;
-    background:var(--gold-hi);transform:translateX(-50%);box-shadow:0 0 12px 2px var(--gold-glow)}
+  .needle::after{content:"";position:absolute;inset-block-start:-1px;inset-inline-start:50%;width:12px;height:12px;border-radius:50%;
+    background:var(--gold-hi);transform:translateX(-50%);box-shadow:0 0 14px 3px var(--gold-glow)}
   .dial .core{font-family:var(--latin);font-style:italic;font-size:13px;color:var(--gold);opacity:.9}
   .fitlbl{font-size:19px;font-weight:600;letter-spacing:-.01em}
   .fitnote{margin-block-start:14px;font-size:13.5px;color:var(--body);line-height:1.55}

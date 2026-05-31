@@ -229,7 +229,7 @@ function lightNeed(key){ $$('#needs .need').forEach(b=>b.classList.toggle('lit',
 function positionNeeds(){
   const inst = $('#instrument'); if (!inst) return;
   if (!FINE.matches && window.matchMedia('(max-width:979px)').matches){ inst.style.removeProperty('--r'); return; }
-  const r = inst.clientWidth * 0.53;
+  const r = inst.clientWidth * 0.56;
   $$('#needs .need').forEach(b=>b.style.setProperty('--r', r+'px'));
 }
 
