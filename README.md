@@ -17,15 +17,29 @@ An interactive **decision-tree / "Immigration Navigator"** homepage:
   documents, an animated **case-fit ring**, and one CTA to talk to a lawyer.
 - RTL Hebrew first, EN toggle (top-left).
 
-## Art direction — "Aurora Glass" (liquid-glass / high-tech)
+## Art direction — "The Compass" (liquid-glass / high-tech)
+The firm's circular gold W·W monogram becomes a **living navigational
+instrument** at the hero's heart (immigration = navigation). The free-text
+navigator is primary; the 6 needs are **headings around the compass**; the
+needle reacts as you hover/type, then the screen morphs into the glass result.
 Apple-visionOS register, on-brand champagne **gold** over near-black.
+- **The instrument:** the real monogram is the hub; concentric rings + degree
+  ticks are drawn around it (inline SVG). It's alive at rest — rings rotate, a
+  radar wedge sweeps, the hub breathes — and the needle *seeks*: it points to a
+  heading on hover and tracks the matcher live as you type. An intro "seal"
+  draws the rings on load. All of it freezes under `prefers-reduced-motion`,
+  and every heading is a real keyboard-reachable `<button>`.
 - **Depth field:** a Stripe-style **WebGL mesh gradient** (vendored
-  `assets/vendor/gradient.js`, MIT — reverse-engineered from Stripe.com).
-  Tuned to a restrained gold + a cool blue counter-tone so the gold reads as
-  *precious metal, not sepia*. A CSS aurora sits beneath as the
-  reduced-motion / offline / no-WebGL fallback so the page is never flat-black.
+  `assets/vendor/gradient.js`, MIT) — restrained gold + a cool counter-tone so
+  it reads as *precious metal, not sepia* — over a faint gold cartographic grid
+  + SVG grain. A CSS aurora is the reduced-motion / offline fallback.
 - **Material:** real frosted glass — warm specular top rim-light, a faint gold
   inner edge, and a swept sheen (`.glass::before`) — the visionOS "lit rim".
+- **Logo as a system:** monogram in the header, the hub of the compass, the
+  breadcrumb glyph in the result, and the full lockup in the footer.
+- **Cut for redundancy:** the kicker pill, the "smart navigator" label, the
+  lede paragraph, and the "or choose your need" divider — the compass headings
+  replace the chip row.
 - **Type (this is what makes it un-generic):** **Secular One** (Hebrew display,
   hero + final headline) × **Noto Sans Hebrew** (UI/body) × **Cormorant
   Garamond** italic (Latin accents — "Immigration Law", client names). No
