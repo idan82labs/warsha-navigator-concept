@@ -85,7 +85,7 @@ const I18N = {
     rkicker:'המסלול שזוהה', c_time:'לוח זמנים משוער', c_docs:'מסמכים מרכזיים', c_fit:'התאמת התיק',
     back:'חזרה', cta_call:'דברו עם עו״ד עכשיו', cta_wa:'או בוואטסאפ',
     disc:'ההערכות לעיל כלליות ומיועדות להתמצאות בלבד — אינן ייעוץ משפטי או התחייבות לתוצאה. תמונה מלאה — רק לאחר פגישת ייעוץ.',
-    s_rank:'Dun’s 100 להגירה', s_years:'ותק וניסיון', s_lawyers:'עורכי דין למעמד', s_langs:'שפות שירות', trusted:'לקוחות הפירמה', logos_hint:'לחצו לצבע',
+    s_rank:'Dun’s 100 להגירה', s_years:'שנות ניסיון', s_lawyers:'עורכי דין למעמד', s_langs:'שפות שירות', trusted:'לקוחות הפירמה', logos_hint:'לחצו לצבע',
     final_h1:'מוכנים להתחיל? בחירה בנו היא בחירה ב', final_h2:'עתיד בטוח.',
     final_p:'23 שנה שאנחנו לוקחים את המקרים שאחרים אומרים עליהם "אי אפשר". בואו נתחיל בשיחה.',
     final_call:'03-561-5845', final_mail:'office@warsha-adv.com', addr:'רח׳ ריב״ל 18, תל אביב',
@@ -107,7 +107,7 @@ const I18N = {
     rkicker:'Your matched route', c_time:'Estimated timeline', c_docs:'Key documents', c_fit:'Case fit',
     back:'Back', cta_call:'Talk to a lawyer now', cta_wa:'or on WhatsApp',
     disc:'The estimates above are general orientation only — not legal advice or a guarantee of outcome. A complete picture requires a consultation.',
-    s_rank:'on Dun’s 100 immigration', s_years:'since 2002', s_lawyers:'status attorneys', s_langs:'service languages', trusted:'Firm clients', logos_hint:'Tap for colour',
+    s_rank:'on Dun’s 100 immigration', s_years:'years of practice', s_lawyers:'status attorneys', s_langs:'service languages', trusted:'Firm clients', logos_hint:'Tap for colour',
     final_h1:'Ready to begin? Choosing us is choosing ', final_h2:'a future you can count on.',
     final_p:'For 23 years we’ve taken the cases others call impossible. Let’s start with a conversation.',
     final_call:'+972-3-561-5845', final_mail:'office@warsha-adv.com', addr:'18 Rival St, Tel Aviv',
@@ -285,7 +285,8 @@ function paintResult(){
   $('#rFitNote').textContent = tk.fitNote;
   let echo;
   if (state.source==='nav'){
-    const from = state.country ? ` · ${t('echo_country')}‏<bdi dir="auto">${state.country}</bdi>` : '';
+    // isolate the Latin country name so it never reorders inside the RTL run
+    const from = state.country ? ` · <bdi dir="ltr">${state.country}</bdi>` : '';
     echo = `<b>${t('echo_lead')}</b> ${tk.tag}${from}`;
   } else { echo = `<b>${t('echo_manual')}</b> ${tk.tag}`; }
   $('#rEcho').innerHTML = echo;

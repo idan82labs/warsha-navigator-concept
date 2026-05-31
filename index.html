@@ -27,7 +27,7 @@
   @font-face{font-family:"Heb Fallback";src:local("Arial");size-adjust:97%;ascent-override:87%;descent-override:24%;line-gap-override:0%}
 
   :root{
-    --bg:#06070B;
+    --bg:#050507;
     --text:#F3F5F8;
     --body:rgba(243,245,248,.74);
     --muted:rgba(243,245,248,.56);
@@ -44,7 +44,7 @@
     --metal:linear-gradient(135deg,#F3D78C 0%,#C9A24B 42%,#9A7A33 70%,#E3C07A 100%);
     /* glass */
     --glass:linear-gradient(157deg, rgba(255,250,242,.11) 0%, rgba(255,255,255,.035) 34%, rgba(255,255,255,.02) 100%);
-    --glass-edge:inset 0 1.4px 0 rgba(255,247,232,.32), inset 1px 0 0 rgba(255,243,222,.10), inset 0 -1px 0 rgba(0,0,0,.28);
+    --glass-edge:inset 0 1.5px 0 rgba(255,249,236,.42), inset 1px 0 0 rgba(255,243,222,.12), inset 0 -1px 0 rgba(0,0,0,.34);
     --glass-rim:1px solid rgba(255,238,205,.16);
     --glass-drop:0 40px 80px -38px rgba(0,0,0,.78), 0 1px 0 rgba(255,255,255,.05);
     --font:"Noto Sans Hebrew","Heb Fallback",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
@@ -68,14 +68,15 @@
   :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
 
   /* ───────── background stack (reactive) ───────── */
-  #gradient-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-5;pointer-events:none;opacity:.72;filter:saturate(.84) brightness(.85);
-    --gradient-color-1:#06070A;--gradient-color-2:#0C1320;--gradient-color-3:#33270F;--gradient-color-4:#574418}
+  #gradient-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-5;pointer-events:none;opacity:.42;filter:saturate(.8) brightness(.7);
+    --gradient-color-1:#040406;--gradient-color-2:#090E18;--gradient-color-3:#241B0C;--gradient-color-4:#3C2D12}
   #stars{position:fixed;inset:0;width:100%;height:100%;z-index:-4;pointer-events:none}
   .field{position:fixed;inset:-20vmax;z-index:-6;pointer-events:none;filter:blur(74px) saturate(135%);opacity:.9;
     transform:translate3d(calc(var(--px,0)*1.6),calc(var(--py,0)*1.6),0);transition:transform .5s var(--e-out)}
+  .field{opacity:.5}
   .field b{position:absolute;border-radius:50%;mix-blend-mode:screen;will-change:transform}
-  .field .a{width:60vmax;height:60vmax;inset-block-start:-8vmax;inset-inline-end:-6vmax;background:radial-gradient(circle,rgba(201,162,75,.32),transparent 62%);animation:dA 36s var(--e-out) infinite alternate}
-  .field .b2{width:52vmax;height:52vmax;inset-block-end:-12vmax;inset-inline-start:-8vmax;background:radial-gradient(circle,rgba(120,90,38,.38),transparent 62%);animation:dB 44s var(--e-out) infinite alternate}
+  .field .a{width:54vmax;height:54vmax;inset-block-start:-12vmax;inset-inline-end:-10vmax;background:radial-gradient(circle,rgba(201,162,75,.2),transparent 60%);animation:dA 36s var(--e-out) infinite alternate}
+  .field .b2{width:46vmax;height:46vmax;inset-block-end:-14vmax;inset-inline-start:-12vmax;background:radial-gradient(circle,rgba(110,82,34,.22),transparent 60%);animation:dB 44s var(--e-out) infinite alternate}
   @keyframes dA{to{transform:translate3d(-8vmax,10vmax,0) scale(1.1)}}
   @keyframes dB{to{transform:translate3d(10vmax,-8vmax,0) scale(1.15)}}
   /* faint cartographic grid — precision/navigation texture (parallax) */
@@ -88,7 +89,7 @@
     background-image:linear-gradient(rgba(227,192,122,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(227,192,122,.16) 1px,transparent 1px);
     -webkit-mask:radial-gradient(300px circle at var(--mx,50%) var(--my,40%),#000,transparent 70%);mask:radial-gradient(300px circle at var(--mx,50%) var(--my,40%),#000,transparent 70%)}
   .veil{position:fixed;inset:0;z-index:-2;pointer-events:none;
-    background:radial-gradient(120% 120% at 50% -8%,transparent 42%,rgba(5,6,10,.5) 100%),linear-gradient(rgba(5,6,10,.05),rgba(5,6,10,.42))}
+    background:radial-gradient(115% 115% at 50% 0%,transparent 30%,rgba(4,4,6,.78) 100%),linear-gradient(rgba(4,4,6,.18),rgba(4,4,6,.6))}
   .spot{position:fixed;inset:0;z-index:-1;pointer-events:none;
     background:radial-gradient(440px circle at var(--mx,50%) var(--my,40%),rgba(227,192,122,.05),transparent 60%);transition:opacity .4s}
   .grain{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.04;mix-blend-mode:soft-light;
@@ -165,6 +166,9 @@
   /* ───────── the compass instrument ───────── */
   .instrument{position:relative;display:grid;place-items:center;justify-self:center;
     inline-size:min(86vw,460px);aspect-ratio:1}
+  /* concentrate the page's gold here — lets the rest of the canvas fall to black */
+  .instrument::before{content:"";position:absolute;inset:-18%;z-index:-1;pointer-events:none;
+    background:radial-gradient(circle,rgba(201,160,82,.2),rgba(201,160,82,.06) 40%,transparent 68%);filter:blur(6px)}
   .compass{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
   .compass .rot-slow{transform-box:fill-box;transform-origin:center;animation:rot 140s linear infinite}
   .compass .rot-rev{transform-box:fill-box;transform-origin:center;animation:rot 100s linear infinite reverse}
@@ -228,8 +232,8 @@
   .r-echo{margin-block-start:14px;max-width:54ch;color:var(--body);font-size:clamp(14.5px,2vw,16.5px);font-weight:300}
   .r-echo b{color:var(--text);font-weight:500}
   .r-grid{margin-block-start:clamp(24px,4vh,34px);display:grid;gap:14px}
-  @media(min-width:820px){.r-grid{grid-template-columns:1.1fr .95fr .95fr}}
-  .cell{border-radius:20px;padding:20px;background:rgba(255,255,255,.04);border:1px solid var(--line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+  @media(min-width:820px){.r-grid{grid-template-columns:1.25fr .85fr}.cell.fit{grid-row:span 2;display:flex;flex-direction:column;justify-content:center}}
+  .cell{border-radius:20px;padding:20px;background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.012));border:1px solid rgba(255,255,255,.085);box-shadow:inset 0 1.2px 0 rgba(255,255,255,.2),0 22px 44px -30px rgba(0,0,0,.65)}
   .cell.fit{background:linear-gradient(160deg,rgba(227,192,122,.14),rgba(227,192,122,.03));border-color:rgba(227,192,122,.26)}
   .cell h3{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
   .cell .big{font-size:clamp(19px,2.6vw,23px);font-weight:500;margin-block-start:11px;letter-spacing:-.01em}
@@ -237,11 +241,11 @@
   .cell li{position:relative;padding-inline-start:17px;font-size:14px;color:var(--body)}
   .cell li::before{content:"";position:absolute;inset-inline-start:0;inset-block-start:8px;width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.6}
   @property --p{syntax:"<number>";inherits:false;initial-value:0}
-  .fitwrap{display:flex;align-items:center;gap:16px;margin-block-start:16px}
-  .ring{--p:0;width:84px;height:84px;border-radius:50%;flex:none;background:conic-gradient(from -90deg,var(--gold) calc(var(--p)*1%),rgba(255,255,255,.09) 0);
-    -webkit-mask:radial-gradient(circle 29px at center,transparent 97%,#000);mask:radial-gradient(circle 29px at center,transparent 97%,#000);
-    filter:drop-shadow(0 0 14px rgba(227,192,122,.28));transition:--p 1100ms var(--e-out)}
-  .fitlbl{font-size:17px;font-weight:600;letter-spacing:-.01em}
+  .fitwrap{display:flex;align-items:center;gap:18px;margin-block-start:18px}
+  .ring{--p:0;width:108px;height:108px;border-radius:50%;flex:none;background:conic-gradient(from -90deg,var(--gold) calc(var(--p)*1%),rgba(255,255,255,.08) 0);
+    -webkit-mask:radial-gradient(circle 40px at center,transparent 97%,#000);mask:radial-gradient(circle 40px at center,transparent 97%,#000);
+    filter:drop-shadow(0 0 18px rgba(227,192,122,.3));transition:--p 1100ms var(--e-out)}
+  .fitlbl{font-size:19px;font-weight:600;letter-spacing:-.01em}
   .fitnote{margin-block-start:14px;font-size:13.5px;color:var(--body);line-height:1.55}
   .r-cta{margin-block-start:clamp(22px,3.5vh,32px);display:flex;flex-wrap:wrap;gap:13px;align-items:center}
   .btn-primary{display:inline-flex;align-items:center;gap:10px;border-radius:15px;padding:15px 26px;font-weight:500;font-size:15.5px;
@@ -258,7 +262,8 @@
   .proof .row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(16px,3vw,30px);padding:18px clamp(18px,3vw,30px);border-radius:20px}
   .proof .p{display:inline-flex;align-items:baseline;gap:8px;font-size:14px;color:var(--muted)}
   .proof .p b{font-size:18px;font-weight:500;color:var(--text);letter-spacing:-.01em}
-  .proof .p.lead b{color:var(--gold)}
+  .proof .p.lead{align-items:baseline}
+  .proof .p.lead b{color:var(--gold);font-size:30px;line-height:1}
   .proof .sep{width:1px;height:20px;background:var(--line)}
   .proof .clients{margin-block-start:26px;display:flex;flex-direction:column;align-items:center;gap:14px}
   .proof .clients .tlabel{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
@@ -451,7 +456,7 @@
     <section class="proof wrap reveal" style="--d:0ms" aria-label="למה בוחרים בנו">
       <div class="row glass">
         <span class="p lead"><b>#1</b> <span data-i18n="s_rank">Dun’s 100 להגירה</span></span><span class="sep"></span>
-        <span class="p"><b>מ־2002</b> <span data-i18n="s_years">ותק וניסיון</span></span><span class="sep"></span>
+        <span class="p"><b>23</b> <span data-i18n="s_years">שנות ניסיון</span></span><span class="sep"></span>
         <span class="p"><b>18</b> <span data-i18n="s_lawyers">עורכי דין למעמד</span></span><span class="sep"></span>
         <span class="p"><b>5</b> <span data-i18n="s_langs">שפות שירות</span></span>
       </div>
