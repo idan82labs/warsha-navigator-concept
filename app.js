@@ -71,8 +71,9 @@ const TRACKS = {
 };
 
 const NEED_ORDER = ['relationship','relocation','refusal','work','parents','asylum'];
-/* bearing of each heading on the compass (deg clockwise from north) */
-const NEED_BEARING = { relationship:30, relocation:90, refusal:150, work:210, parents:270, asylum:330 };
+/* bearing of each heading on the compass (deg clockwise from north).
+   Aligned to 60° steps so each option can lock under the north marker (mobile rotary). */
+const NEED_BEARING = { relationship:0, relocation:60, refusal:120, work:180, parents:240, asylum:300 };
 
 /* ───────────────────────── i18n (UI chrome) ───────────────────────── */
 const I18N = {
@@ -86,6 +87,7 @@ const I18N = {
     back:'חזרה', cta_call:'דברו עם עו״ד עכשיו', cta_wa:'או בוואטסאפ',
     disc:'ההערכות לעיל כלליות ומיועדות להתמצאות בלבד — אינן ייעוץ משפטי או התחייבות לתוצאה. תמונה מלאה — רק לאחר פגישת ייעוץ.',
     s_rank:'Dun’s 100 להגירה', s_years:'שנות ניסיון', s_lawyers:'עורכי דין למעמד', s_langs:'שפות שירות', trusted:'לקוחות הפירמה', logos_hint:'לחצו לצבע',
+    ro_kick:'המסלול שנבחר', ro_lock:'בחרו במסלול', ro_drag:'סובבו את המצפן · ואז בחרו',
     final_h1:'מוכנים להתחיל? בחירה בנו היא בחירה ב', final_h2:'עתיד בטוח.',
     final_p:'23 שנה שאנחנו לוקחים את המקרים שאחרים אומרים עליהם "אי אפשר". בואו נתחיל בשיחה.',
     final_call:'03-561-5845', final_mail:'office@warsha-adv.com', addr:'רח׳ ריב״ל 18, תל אביב',
@@ -108,6 +110,7 @@ const I18N = {
     back:'Back', cta_call:'Talk to a lawyer now', cta_wa:'or on WhatsApp',
     disc:'The estimates above are general orientation only — not legal advice or a guarantee of outcome. A complete picture requires a consultation.',
     s_rank:'on Dun’s 100 immigration', s_years:'years of practice', s_lawyers:'status attorneys', s_langs:'service languages', trusted:'Firm clients', logos_hint:'Tap for colour',
+    ro_kick:'Selected route', ro_lock:'Choose this route', ro_drag:'Spin the compass · then choose',
     final_h1:'Ready to begin? Choosing us is choosing ', final_h2:'a future you can count on.',
     final_p:'For 23 years we’ve taken the cases others call impossible. Let’s start with a conversation.',
     final_call:'+972-3-561-5845', final_mail:'office@warsha-adv.com', addr:'18 Rival St, Tel Aviv',
@@ -195,7 +198,8 @@ function releaseNeedle(){ needle.hold = performance.now(); }
 function needleTick(now){
   if (!needle.idle && now > needle.hold) needle.idle = true;
   let target = needle.target;
-  if (needle.idle) target = 9 * Math.sin(now/2100);     // calm ±9° drift
+  if (rotaryOn()) target = 0;                            // mobile: needle pins to the north selection slot
+  else if (needle.idle) target = 9 * Math.sin(now/2100); // desktop: calm ±9° drift
   // shortest-path interpolation
   let d = ((target - needle.cur + 540) % 360) - 180;
   needle.cur += d * 0.12;
@@ -215,24 +219,47 @@ function buildNeeds(){
     b.innerHTML = `<span class="pip" aria-hidden="true"></span><span class="lbl">${tk.short}</span>`+
       `<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     b.setAttribute('aria-label', tk.tag);
-    b.addEventListener('click', ()=>choose(key,'manual'));
+    const i = NEED_ORDER.indexOf(key);
+    b.addEventListener('click', ()=>{ if (rotaryOn()){ dialTo(i); } else { choose(key,'manual'); } });
     if (FINE.matches){
-      b.addEventListener('pointerenter', ()=>{ lightNeed(key); setNeedle(NEED_BEARING[key]); });
-      b.addEventListener('pointerleave', ()=>{ lightNeed(null); releaseNeedle(); });
+      b.addEventListener('pointerenter', ()=>{ if(!rotaryOn()){ lightNeed(key); setNeedle(NEED_BEARING[key]); } });
+      b.addEventListener('pointerleave', ()=>{ if(!rotaryOn()){ lightNeed(null); releaseNeedle(); } });
     }
-    b.addEventListener('focus', ()=>{ lightNeed(key); setNeedle(NEED_BEARING[key]); });
-    b.addEventListener('blur', ()=>{ lightNeed(null); releaseNeedle(); });
+    b.addEventListener('focus', ()=>{ if(!rotaryOn()){ lightNeed(key); setNeedle(NEED_BEARING[key]); } });
+    b.addEventListener('blur', ()=>{ if(!rotaryOn()){ lightNeed(null); releaseNeedle(); } });
     host.appendChild(b);
   });
   positionNeeds();
+  paintActive();
 }
 function lightNeed(key){ $$('#needs .need').forEach(b=>b.classList.toggle('lit', b.dataset.need===key)); }
 function positionNeeds(){
-  const inst = $('#instrument'); if (!inst) return;
-  if (!FINE.matches && window.matchMedia('(max-width:979px)').matches){ inst.style.removeProperty('--r'); return; }
-  const r = inst.clientWidth * 0.56;
+  const stage = $('#compassStage'); if (!stage) return;
+  const r = stage.clientWidth * (rotaryOn() ? 0.40 : 0.56);   // mobile: orbit inside ring · desktop: headings outside
   $$('#needs .need').forEach(b=>b.style.setProperty('--r', r+'px'));
 }
+
+/* ───────────────────────── mobile rotary selector ─────────────────────────
+   The dial of need-labels rotates; whichever option lands under the north
+   marker is "active", and the lock button commits it. Desktop keeps the radial
+   click (rot stays 0). */
+const rotary = { rot:0, idx:0 };
+function rotaryOn(){ return window.matchMedia('(max-width:979px)').matches; }
+function setDialRot(deg, drag){
+  rotary.rot = deg;
+  const host = $('#needs'); if (!host) return;
+  host.style.setProperty('--rot', deg+'deg');
+  host.classList.toggle('drag', !!drag);
+  const idx = ((Math.round(-deg/60)%6)+6)%6;
+  if (idx !== rotary.idx){ rotary.idx = idx; paintActive(); }
+}
+function paintActive(){
+  const labels = $$('#needs .need');
+  labels.forEach((l,i)=>l.classList.toggle('active', i===rotary.idx && rotaryOn()));
+  const ro = $('#roName'); if (ro) ro.textContent = TRACKS[NEED_ORDER[rotary.idx]][state.lang].tag;
+}
+function dialTo(i){ setDialRot(-i*60); }
+function dialStep(d){ dialTo(((rotary.idx + d)%6+6)%6); }
 
 /* ───────────────────────── i18n + lang ───────────────────────── */
 function moveThumb(){
@@ -349,8 +376,10 @@ function onType(){
   clearTimeout(liveT);
   liveT = setTimeout(()=>{
     const m = matchQuery($('#navInput').value);
-    if (m && m.track){ setNeedle(NEED_BEARING[m.track]); lightNeed(m.track); }
-    else { lightNeed(null); releaseNeedle(); }
+    if (m && m.track){
+      if (rotaryOn()) dialTo(NEED_ORDER.indexOf(m.track));   // mobile: spin the dial to the live match
+      else { setNeedle(NEED_BEARING[m.track]); lightNeed(m.track); }
+    } else if (!rotaryOn()){ lightNeed(null); releaseNeedle(); }
   }, 130);
 }
 
@@ -441,7 +470,28 @@ function init(){
     applyLang();
   }));
   window.addEventListener('popstate', ()=>{ readHash(); commit(); });
-  window.addEventListener('resize', ()=>{ positionNeeds(); moveThumb(); });
+  window.addEventListener('resize', ()=>{
+    positionNeeds(); moveThumb();
+    $('#needs').style.setProperty('--rot', rotaryOn() ? (-rotary.idx*60)+'deg' : '0deg');
+    paintActive();
+  });
+
+  // mobile rotary: controls + drag-to-spin
+  const prev=$('#dialPrev'), next=$('#dialNext'), lock=$('#dialLock'), stage=$('#compassStage');
+  if (prev) prev.addEventListener('click', ()=>dialStep(-1));
+  if (next) next.addEventListener('click', ()=>dialStep(1));
+  if (lock) lock.addEventListener('click', ()=>choose(NEED_ORDER[rotary.idx],'manual'));
+  if (stage){
+    let dragging=false, startA=0, startRot=0;
+    const ang=e=>{ const r=stage.getBoundingClientRect(); return Math.atan2(e.clientY-(r.top+r.height/2), e.clientX-(r.left+r.width/2))*180/Math.PI; };
+    stage.addEventListener('pointerdown', e=>{ if(!rotaryOn())return; dragging=true; startA=ang(e); startRot=rotary.rot; try{stage.setPointerCapture(e.pointerId);}catch(_){} });
+    stage.addEventListener('pointermove', e=>{ if(!dragging)return; setDialRot(startRot+(ang(e)-startA), true); });
+    stage.addEventListener('pointerup', e=>{ if(!dragging)return; dragging=false; setDialRot(Math.round(rotary.rot/60)*60); });
+    stage.addEventListener('pointercancel', ()=>{ if(!dragging)return; dragging=false; setDialRot(Math.round(rotary.rot/60)*60); });
+  }
+  // initialise dial state
+  $('#needs').style.setProperty('--rot', rotaryOn() ? '0deg' : '0deg');
+  paintActive();
 
   // client logos: greyscale → colour on click (toggle)
   const logos = $('#logos');
