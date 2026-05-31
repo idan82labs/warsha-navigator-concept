@@ -212,7 +212,8 @@ function buildNeeds(){
     const b = document.createElement('button');
     b.type='button'; b.className='need'; b.dataset.need = key;
     b.style.setProperty('--a', NEED_BEARING[key]+'deg'); // 0deg = north (matches needle bearing)
-    b.innerHTML = `<span class="pip" aria-hidden="true"></span><span>${tk.short}</span>`;
+    b.innerHTML = `<span class="pip" aria-hidden="true"></span><span class="lbl">${tk.short}</span>`+
+      `<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     b.setAttribute('aria-label', tk.tag);
     b.addEventListener('click', ()=>choose(key,'manual'));
     if (FINE.matches){
