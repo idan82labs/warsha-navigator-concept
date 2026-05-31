@@ -138,9 +138,10 @@
   /* navigator console */
   .console{width:min(560px,100%);margin-block-start:clamp(22px,3vh,32px)}
   .nav-field{display:flex;align-items:center;gap:8px;padding:7px 7px 7px 20px;border-radius:20px;position:relative;isolation:isolate;
-    background:var(--glass);backdrop-filter:blur(22px) saturate(155%);-webkit-backdrop-filter:blur(22px) saturate(155%);
-    border:var(--glass-rim);box-shadow:var(--glass-edge),0 24px 50px -34px rgba(0,0,0,.7);transition:border-color .3s var(--e-out),box-shadow .3s var(--e-out)}
-  .nav-field:focus-within{border-color:rgba(227,192,122,.5);box-shadow:var(--glass-edge),0 0 0 1px rgba(227,192,122,.4),0 0 40px -8px var(--gold-glow)}
+    background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.025));backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
+    border:var(--glass-rim);box-shadow:var(--glass-edge),0 28px 56px -22px rgba(0,0,0,.82);transition:border-color .3s var(--e-out),box-shadow .3s var(--e-out)}
+  .nav-field:focus-within{border-color:rgba(227,192,122,.55);box-shadow:var(--glass-edge),0 0 0 1px rgba(227,192,122,.5),0 0 38px -6px var(--gold-glow)}
+  .nav-cap{font-family:var(--latin);font-style:italic;font-size:15px;color:var(--muted);margin-block-end:10px;letter-spacing:.01em}
   .nav-input-wrap{position:relative;flex:1;min-width:0;display:flex;align-items:center}
   .nav-field input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:16.5px;font-weight:400;padding-block:15px;text-align:start}
   .nav-field input::placeholder{color:transparent}
@@ -188,7 +189,7 @@
   .need{position:absolute;top:50%;left:50%;pointer-events:auto;
     transform:translate(-50%,-50%) rotate(var(--a)) translateY(calc(-1*var(--r))) rotate(calc(-1*var(--a)));
     display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
-    font-size:13.5px;font-weight:500;color:var(--body);padding:9px 14px;border-radius:999px;
+    font-size:14px;font-weight:500;color:var(--body);padding:9px 14px;border-radius:999px;
     background:rgba(10,11,16,.42);border:1px solid var(--line);backdrop-filter:blur(8px);
     transition:color .3s,border-color .3s,background .3s,transform .35s var(--e-back),box-shadow .3s}
   .need .pip{inline-size:5px;block-size:5px;border-radius:50%;background:var(--gold);opacity:.5;transition:opacity .3s,box-shadow .3s}
@@ -227,7 +228,7 @@
   .crumb .chev{color:var(--gold)} [dir="rtl"] .crumb .chev{transform:scaleX(-1)}
   .crumb .glyph{inline-size:18px;block-size:18px;opacity:.9}
   .crumb .pill{padding:6px 13px;border-radius:999px;color:var(--text);background:rgba(227,192,122,.12);border:1px solid rgba(227,192,122,.3)}
-  .r-kicker{margin-block-start:18px;font-family:var(--latin);font-style:italic;font-size:15px;letter-spacing:.02em;color:var(--gold)}
+  .r-kicker{margin-block-start:18px;font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
   .r-title{font-weight:600;font-size:clamp(1.9rem,4.6vw,3rem);line-height:1.08;letter-spacing:-.02em;margin-block-start:7px;max-width:20ch}
   .r-echo{margin-block-start:14px;max-width:54ch;color:var(--body);font-size:clamp(14.5px,2vw,16.5px);font-weight:300}
   .r-echo b{color:var(--text);font-weight:500}
@@ -242,9 +243,15 @@
   .cell li::before{content:"";position:absolute;inset-inline-start:0;inset-block-start:8px;width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.6}
   @property --p{syntax:"<number>";inherits:false;initial-value:0}
   .fitwrap{display:flex;align-items:center;gap:18px;margin-block-start:18px}
-  .ring{--p:0;width:108px;height:108px;border-radius:50%;flex:none;background:conic-gradient(from -90deg,var(--gold) calc(var(--p)*1%),rgba(255,255,255,.08) 0);
+  .dial{position:relative;width:108px;height:108px;flex:none;display:grid;place-items:center}
+  .ring{--p:0;position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -90deg,var(--gold) calc(var(--p)*1%),rgba(255,255,255,.07) 0);
     -webkit-mask:radial-gradient(circle 40px at center,transparent 97%,#000);mask:radial-gradient(circle 40px at center,transparent 97%,#000);
     filter:drop-shadow(0 0 18px rgba(227,192,122,.3));transition:--p 1100ms var(--e-out)}
+  /* gold marker that travels to the reading — makes it a measured dial, not a loader */
+  .needle{position:absolute;inset:0;transform:rotate(var(--mark,0deg));transition:transform 1100ms var(--e-out)}
+  .needle::after{content:"";position:absolute;inset-block-start:1px;inset-inline-start:50%;width:9px;height:9px;border-radius:50%;
+    background:var(--gold-hi);transform:translateX(-50%);box-shadow:0 0 12px 2px var(--gold-glow)}
+  .dial .core{font-family:var(--latin);font-style:italic;font-size:13px;color:var(--gold);opacity:.9}
   .fitlbl{font-size:19px;font-weight:600;letter-spacing:-.01em}
   .fitnote{margin-block-start:14px;font-size:13.5px;color:var(--body);line-height:1.55}
   .r-cta{margin-block-start:clamp(22px,3.5vh,32px);display:flex;flex-wrap:wrap;gap:13px;align-items:center}
@@ -261,7 +268,7 @@
   .proof{padding-block:clamp(40px,7vh,72px)}
   .proof .row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(16px,3vw,30px);padding:18px clamp(18px,3vw,30px);border-radius:20px}
   .proof .p{display:inline-flex;align-items:baseline;gap:8px;font-size:14px;color:var(--muted)}
-  .proof .p b{font-size:18px;font-weight:500;color:var(--text);letter-spacing:-.01em}
+  .proof .p b{font-size:22px;font-weight:500;color:var(--text);letter-spacing:-.01em}
   .proof .p.lead{align-items:baseline}
   .proof .p.lead b{color:var(--gold);font-size:30px;line-height:1}
   .proof .sep{width:1px;height:20px;background:var(--line)}
@@ -270,8 +277,10 @@
   .proof .clients .tlabel.hint{opacity:.7}
   .logos{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(22px,4.5vw,52px)}
   .cl-logo{display:grid;place-items:center;padding:6px;border-radius:12px;transition:transform .3s var(--e-back)}
-  .cl-logo img{block-size:30px;inline-size:auto;max-inline-size:128px;object-fit:contain;
+  .cl-logo img{block-size:26px;inline-size:auto;max-inline-size:128px;object-fit:contain;
     filter:grayscale(1) brightness(1.55) opacity(.6);transition:filter .55s var(--e-out),opacity .55s var(--e-out)}
+  .cl-logo img.lw{block-size:22px}   /* wordmarks read smaller */
+  .cl-logo img.lc{block-size:44px}   /* crests need more height to balance */
   .cl-logo:hover img{filter:grayscale(1) brightness(1.95) opacity(.85)}
   .cl-logo.on img{filter:none;opacity:1}
   .cl-logo:active{transform:scale(.95)}
@@ -300,6 +309,7 @@
   .callbar .call{flex:2;color:var(--gold-ink);background:var(--metal);box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
   .callbar .wa{flex:1;color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line)}
   .callbar a:active{transform:scale(.98)}
+  .callbar{padding-inline:18px}
   @media(max-width:780px){.callbar{display:flex} body{padding-block-end:96px}
     .result{align-content:start;min-height:auto;padding-block:clamp(20px,4vh,40px)}
     .hero{min-height:auto;padding-block:clamp(16px,5vh,40px)}}
@@ -353,6 +363,7 @@
             <span data-i18n="h1a">מסע ההגירה שלכם</span> <span data-i18n="h1b">מתחיל ב</span><span class="accent shimmer" data-i18n="h1c">שאלה אחת</span><span>.</span>
           </h1>
           <form class="console reveal" style="--d:300ms" id="navForm" autocomplete="off">
+            <p class="nav-cap">Immigration, charted.</p>
             <div class="nav-field">
               <div class="nav-input-wrap">
                 <input id="navInput" name="q" type="text" dir="auto" aria-label="תארו את המצב שלכם" />
@@ -427,7 +438,7 @@
           <div class="r-grid">
             <div class="cell fit">
               <h3 data-i18n="c_fit">התאמת התיק</h3>
-              <div class="fitwrap"><span class="ring" id="rRing" aria-hidden="true"></span><span class="fitlbl" id="rFitLbl"></span></div>
+              <div class="fitwrap"><span class="dial" aria-hidden="true"><span class="ring" id="rRing"></span><span class="needle" id="rNeedle"></span></span><span class="fitlbl" id="rFitLbl"></span></div>
               <p class="fitnote" id="rFitNote"></p>
             </div>
             <div class="cell">
@@ -463,11 +474,11 @@
       <div class="clients" aria-label="לקוחות נבחרים">
         <span class="tlabel" data-i18n="trusted">לקוחות הפירמה</span>
         <ul class="logos" id="logos">
-          <li><button class="cl-logo" type="button" aria-label="Netflix"><img src="assets/brand/clients/netflix.png" alt="Netflix" /></button></li>
-          <li><button class="cl-logo" type="button" aria-label="Google"><img src="assets/brand/clients/google.png" alt="Google" /></button></li>
-          <li><button class="cl-logo" type="button" aria-label="ZEISS"><img src="assets/brand/clients/zeiss.svg" alt="ZEISS" /></button></li>
-          <li><button class="cl-logo" type="button" aria-label="Philip Morris International"><img src="assets/brand/clients/pmi.svg" alt="Philip Morris International" /></button></li>
-          <li><button class="cl-logo" type="button" aria-label="Maccabi Tel Aviv"><img src="assets/brand/clients/maccabi.png" alt="Maccabi Tel Aviv" /></button></li>
+          <li><button class="cl-logo" type="button" aria-label="Netflix"><img class="lw" src="assets/brand/clients/netflix.png" alt="Netflix" /></button></li>
+          <li><button class="cl-logo" type="button" aria-label="Google"><img class="lw" src="assets/brand/clients/google.png" alt="Google" /></button></li>
+          <li><button class="cl-logo" type="button" aria-label="ZEISS"><img class="lw" src="assets/brand/clients/zeiss.svg" alt="ZEISS" /></button></li>
+          <li><button class="cl-logo" type="button" aria-label="Philip Morris International"><img class="lc" src="assets/brand/clients/pmi.svg" alt="Philip Morris International" /></button></li>
+          <li><button class="cl-logo" type="button" aria-label="Maccabi Tel Aviv"><img class="lc" src="assets/brand/clients/maccabi.png" alt="Maccabi Tel Aviv" /></button></li>
         </ul>
         <span class="tlabel hint" data-i18n="logos_hint">לחצו לצבע</span>
       </div>

@@ -277,10 +277,10 @@ function paintResult(){
   $('#rTime').textContent = tk.time;
   $('#rDocs').innerHTML = tk.docs.map(d=>`<li>${d}</li>`).join('');
   const FILL = { strong:84, moderate:62, complex:40 };
-  const ring = $('#rRing'), target = FILL[tk.fit] || 50;
-  ring.style.setProperty('--p', 0);
-  if (reduce()) ring.style.setProperty('--p', target);
-  else requestAnimationFrame(()=>requestAnimationFrame(()=>ring.style.setProperty('--p', target)));
+  const ring = $('#rRing'), needle = $('#rNeedle'), target = FILL[tk.fit] || 50, mark = (target/100*360).toFixed(1)+'deg';
+  ring.style.setProperty('--p', 0); if (needle) needle.style.setProperty('--mark','0deg');
+  if (reduce()){ ring.style.setProperty('--p', target); if (needle) needle.style.setProperty('--mark', mark); }
+  else requestAnimationFrame(()=>requestAnimationFrame(()=>{ ring.style.setProperty('--p', target); if (needle) needle.style.setProperty('--mark', mark); }));
   $('#rFitLbl').textContent = t('fit_'+tk.fit);
   $('#rFitNote').textContent = tk.fitNote;
   let echo;
