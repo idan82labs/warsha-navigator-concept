@@ -85,7 +85,7 @@ const I18N = {
     rkicker:'המסלול שזוהה', c_time:'לוח זמנים משוער', c_docs:'מסמכים מרכזיים', c_fit:'התאמת התיק',
     back:'חזרה', cta_call:'דברו עם עו״ד עכשיו', cta_wa:'או בוואטסאפ',
     disc:'ההערכות לעיל כלליות ומיועדות להתמצאות בלבד — אינן ייעוץ משפטי או התחייבות לתוצאה. תמונה מלאה — רק לאחר פגישת ייעוץ.',
-    s_rank:'Dun’s 100 להגירה', s_years:'ותק וניסיון', s_lawyers:'עורכי דין למעמד', s_langs:'שפות שירות', trusted:'לקוחות הפירמה',
+    s_rank:'Dun’s 100 להגירה', s_years:'ותק וניסיון', s_lawyers:'עורכי דין למעמד', s_langs:'שפות שירות', trusted:'לקוחות הפירמה', logos_hint:'לחצו לצבע',
     final_h1:'מוכנים להתחיל? בחירה בנו היא בחירה ב', final_h2:'עתיד בטוח.',
     final_p:'23 שנה שאנחנו לוקחים את המקרים שאחרים אומרים עליהם "אי אפשר". בואו נתחיל בשיחה.',
     final_call:'03-561-5845', final_mail:'office@warsha-adv.com', addr:'רח׳ ריב״ל 18, תל אביב',
@@ -107,7 +107,7 @@ const I18N = {
     rkicker:'Your matched route', c_time:'Estimated timeline', c_docs:'Key documents', c_fit:'Case fit',
     back:'Back', cta_call:'Talk to a lawyer now', cta_wa:'or on WhatsApp',
     disc:'The estimates above are general orientation only — not legal advice or a guarantee of outcome. A complete picture requires a consultation.',
-    s_rank:'on Dun’s 100 immigration', s_years:'since 2002', s_lawyers:'status attorneys', s_langs:'service languages', trusted:'Firm clients',
+    s_rank:'on Dun’s 100 immigration', s_years:'since 2002', s_lawyers:'status attorneys', s_langs:'service languages', trusted:'Firm clients', logos_hint:'Tap for colour',
     final_h1:'Ready to begin? Choosing us is choosing ', final_h2:'a future you can count on.',
     final_p:'For 23 years we’ve taken the cases others call impossible. Let’s start with a conversation.',
     final_call:'+972-3-561-5845', final_mail:'office@warsha-adv.com', addr:'18 Rival St, Tel Aviv',
@@ -166,6 +166,7 @@ const $ = (s,el=document)=>el.querySelector(s);
 const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
 const FINE = matchMedia('(pointer: fine)');
+const mouse = { x:-999, y:-999 };
 const reduce = ()=>RM.matches;
 function t(key){ return (I18N[state.lang] && I18N[state.lang][key]) || I18N.he[key] || key; }
 
@@ -365,6 +366,37 @@ function initMagnetic(){
   });
 }
 
+/* ───────────────────────── constellation (reactive bg) ─────────────────────────
+   A celestial-navigation starfield behind the glass: points drift, link to near
+   neighbours, and connect/light to the cursor. Desktop + motion only; pauses
+   when the tab is hidden. */
+function initConstellation(){
+  const cv = document.getElementById('stars'); if (!cv) return;
+  const ctx = cv.getContext('2d'); const DPR = Math.min(devicePixelRatio||1, 2);
+  let W=0,H=0,pts=[],raf=0,running=true;
+  function resize(){
+    W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+    const n=Math.min(88, Math.round(W*H/16500));
+    pts=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,r:Math.random()*1.3+.4}));
+  }
+  function step(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of pts){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.2832); ctx.fillStyle='rgba(227,192,122,.5)'; ctx.fill(); }
+    for(let i=0;i<pts.length;i++){ for(let j=i+1;j<pts.length;j++){
+      const a=pts[i],b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=dx*dx+dy*dy;
+      if(d<13000){ ctx.strokeStyle='rgba(227,192,122,'+((1-d/13000)*.14).toFixed(3)+')'; ctx.lineWidth=.6;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); } } }
+    if(mouse.x>0){ for(const p of pts){ const dx=p.x-mouse.x,dy=p.y-mouse.y,d=dx*dx+dy*dy;
+      if(d<42000){ ctx.strokeStyle='rgba(243,215,140,'+((1-d/42000)*.5).toFixed(3)+')'; ctx.lineWidth=.7;
+        ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke(); } } }
+    if(running) raf=requestAnimationFrame(step);
+  }
+  resize(); addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', ()=>{ running=!document.hidden; if(running){ step(); } else cancelAnimationFrame(raf); });
+  step();
+}
+
 /* ───────────────────────── routing + boot ───────────────────────── */
 function readHash(){
   const h = location.hash || '';
@@ -409,11 +441,20 @@ function init(){
   window.addEventListener('popstate', ()=>{ readHash(); commit(); });
   window.addEventListener('resize', ()=>{ positionNeeds(); moveThumb(); });
 
-  // scroll chrome + spotlight
+  // client logos: greyscale → colour on click (toggle)
+  const logos = $('#logos');
+  if (logos) logos.addEventListener('click', e=>{ const b=e.target.closest('.cl-logo'); if(b) b.classList.toggle('on'); });
+
+  // scroll chrome + reactive background (cursor-lit grid, parallax) + constellation
   addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', scrollY>8), {passive:true});
   if (FINE.matches && !reduce()){
-    const spot=$('.spot');
-    addEventListener('pointermove', e=>{ spot.style.setProperty('--mx',e.clientX+'px'); spot.style.setProperty('--my',e.clientY+'px'); }, {passive:true});
+    addEventListener('pointermove', e=>{
+      const x=e.clientX, y=e.clientY; mouse.x=x; mouse.y=y;
+      root.style.setProperty('--mx', x+'px'); root.style.setProperty('--my', y+'px');
+      root.style.setProperty('--px', ((x/innerWidth-0.5)*-16).toFixed(1)+'px');
+      root.style.setProperty('--py', ((y/innerHeight-0.5)*-16).toFixed(1)+'px');
+    }, {passive:true});
+    initConstellation();
   }
   initMagnetic();
 }
