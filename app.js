@@ -78,7 +78,7 @@ const I18N = {
   he: {
     brand:'ורשה', brand2:'וייצן', brandsub:'Immigration Law',
     rank:'מדורגים #1 בהגירה · Dun’s 100',
-    h1a:'מסע ההגירה שלכם', h1b:'מתחיל ב', h1c:'שאלה אחת.',
+    h1a:'מסע ההגירה שלכם', h1b:'מתחיל ב', h1c:'שאלה אחת',
     lede:'ספרו לנו במשפט אחד מה הביא אתכם — ונבנה עבורכם את המסלול: לוח זמנים, מסמכים נדרשים, והצעד הבא.',
     navlabel:'המנווט החכם', ph:'למשל: אני אזרחית ישראלית ובן הזוג שלי מארגנטינה',
     go:'בנו לי מסלול', analyzing:'מנתח…', hint:'ללא טפסים. תשובה מיידית. שיחה עם עו״ד רק כשתבחרו.',
@@ -86,11 +86,11 @@ const I18N = {
     rkicker:'המסלול שזוהה', c_time:'לוח זמנים משוער', c_docs:'מסמכים מרכזיים', c_fit:'התאמת התיק',
     back:'חזרה', cta_call:'דברו עם עו״ד עכשיו', cta_wa:'או בוואטסאפ',
     disc:'ההערכות לעיל הן כלליות ומיועדות להתמצאות בלבד — אינן מהוות ייעוץ משפטי או התחייבות לתוצאה. כל תיק נבחן לגופו.',
-    proof_lead:'למה בוחרים בנו', s_years:'שנות מומחיות', s_lawyers:'עורכי דין למעמד והגירה',
-    s_rank:'בדירוג Dun’s 100', s_langs:'שפות שירות', trusted:'בין לקוחותינו',
-    final_h:'בחירה בנו היא בחירה בביטחון, במקצוענות, ובעתיד בטוח.',
+    s_rank:'Dun’s 100 להגירה', s_years:'שנות מומחיות', s_lawyers:'עורכי דין למעמד',
+    s_langs:'שפות שירות', trusted:'בין לקוחותינו',
+    final_h1:'בחירה בנו היא בחירה ב', final_h2:'ביטחון, מקצוענות, ועתיד בטוח.',
     final_p:'23 שנה שאנחנו לוקחים את המקרים שאחרים אומרים עליהם "אי אפשר". בואו נתחיל בשיחה.',
-    final_call:'053-491-1336', final_mail:'office@warsha-adv.com', addr:'רח׳ ריב״ל 18, תל אביב',
+    final_call:'03-561-5845', final_mail:'office@warsha-adv.com', addr:'רח׳ ריב״ל 18, תל אביב',
     bar_call:'חייגו עכשיו', bar_wa:'וואטסאפ',
     fit_strong:'התאמה גבוהה', fit_moderate:'התאמה בינונית', fit_complex:'מורכב — נדרשת בדיקה',
     echo_lead:'הבנו:', echo_manual:'בחרתם:', echo_country:'מ־',
@@ -106,7 +106,7 @@ const I18N = {
   en: {
     brand:'Warsha', brand2:'Weitzen', brandsub:'Immigration Law',
     rank:'#1 in immigration · Dun’s 100',
-    h1a:'Your immigration journey', h1b:'begins with ', h1c:'one question.',
+    h1a:'Your immigration journey', h1b:'begins with ', h1c:'one question',
     lede:'Tell us in one line what brought you — we’ll map your route: timeline, documents, and the next step.',
     navlabel:'The smart navigator', ph:'e.g. I’m an Israeli citizen and my partner is from Argentina',
     go:'Map my route', analyzing:'Analyzing…', hint:'No forms. Instant answer. You talk to a lawyer only when you choose to.',
@@ -114,11 +114,11 @@ const I18N = {
     rkicker:'Your matched route', c_time:'Estimated timeline', c_docs:'Key documents', c_fit:'Case fit',
     back:'Back', cta_call:'Talk to a lawyer now', cta_wa:'or on WhatsApp',
     disc:'The estimates above are general orientation only — not legal advice or a guarantee of outcome. Every case is assessed on its own merits.',
-    proof_lead:'Why people choose us', s_years:'years of expertise', s_lawyers:'status & immigration attorneys',
-    s_rank:'ranked on Dun’s 100', s_langs:'service languages', trusted:'Among our clients',
-    final_h:'Choosing us is choosing security, expertise, and a future you can count on.',
+    s_rank:'on Dun’s 100 immigration', s_years:'years of expertise', s_lawyers:'status attorneys',
+    s_langs:'service languages', trusted:'Among our clients',
+    final_h1:'Choosing us is choosing ', final_h2:'security, expertise, and a future you can count on.',
     final_p:'For 23 years we’ve taken the cases others call impossible. Let’s start with a conversation.',
-    final_call:'+972-53-491-1336', final_mail:'office@warsha-adv.com', addr:'18 Rival St, Tel Aviv',
+    final_call:'+972-3-561-5845', final_mail:'office@warsha-adv.com', addr:'18 Rival St, Tel Aviv',
     bar_call:'Call now', bar_wa:'WhatsApp',
     fit_strong:'Strong fit', fit_moderate:'Moderate fit', fit_complex:'Complex — needs review',
     echo_lead:'We understood:', echo_manual:'You chose:', echo_country:'from ',
@@ -192,23 +192,16 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function t(key){ return (I18N[state.lang] && I18N[state.lang][key]) || I18N.he[key] || key; }
 
-/* build the need pills once */
+/* build the need chips once — label-only glass pills (no boxes-with-text).
+   They ride the parent #needs reveal, so no per-chip stagger to race. */
 function buildNeeds(){
   const host = $('#needs');
   host.innerHTML = '';
-  NEED_ORDER.forEach((key,i)=>{
+  NEED_ORDER.forEach((key)=>{
     const tk = TRACKS[key][state.lang];
     const b = document.createElement('button');
-    // Cap the stagger tail at 400ms so a fast tapper never hits a pill that's
-    // still mid-fade (usability audit). Base 200 + 40/step → last pill ≤ 400ms.
-    b.type='button'; b.className='need reveal'; b.style.setProperty('--d', Math.min(200 + i*40, 400)+'ms');
-    b.dataset.need = key;
-    b.innerHTML =
-      `<span class="idx">0${i+1}</span>`+
-      `<span class="ttl">${tk.tag}</span>`+
-      `<span class="sub">${I18N[state.lang].needsub[key]}</span>`+
-      `<span class="go" aria-hidden="true">`+
-        `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+    b.type='button'; b.className='chip'; b.dataset.need = key;
+    b.innerHTML = `<span class="dot" aria-hidden="true"></span><span>${tk.tag}</span>`;
     b.setAttribute('aria-label', tk.tag);
     b.addEventListener('click', ()=>choose(key,'manual'));
     host.appendChild(b);
@@ -232,7 +225,13 @@ function paintResult(){
   $('#r-title').textContent = tk.title;
   $('#rTime').textContent = tk.time;
   const docs = $('#rDocs'); docs.innerHTML = tk.docs.map(d=>`<li>${d}</li>`).join('');
-  const fit = $('#rFit'); fit.dataset.level = tk.fit;
+  // qualitative fit → a conic fill (no number shown — orientation, not a guarantee).
+  // Reset to 0 then animate up to target so the ring visibly "fills" on each reveal.
+  const FILL = { strong:84, moderate:62, complex:40 };
+  const ring = $('#rRing'), target = FILL[tk.fit] || 50;
+  ring.style.setProperty('--p', 0);
+  if (reduce){ ring.style.setProperty('--p', target); }
+  else { requestAnimationFrame(()=>requestAnimationFrame(()=>ring.style.setProperty('--p', target))); }
   $('#rFitLbl').textContent = t('fit_'+tk.fit);
   $('#rFitNote').textContent = tk.fitNote;
   // echo what we understood
