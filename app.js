@@ -197,11 +197,11 @@ function setNeedle(deg){ needle.target = deg; needle.idle = false; needle.hold =
 function releaseNeedle(){ needle.hold = performance.now(); }
 function needleTick(now){
   if (!needle.idle && now > needle.hold) needle.idle = true;
-  let target = needle.target;
-  if (rotaryOn() && !FINE.matches) target = 0;           // touch mobile: pin to the north selection slot
-  else if (needle.idle) target = 2.5 * Math.sin(now/3200); // calm ambient drift (won't mask a real seek)
+  let target = needle.target;                            // touch dial drives needle.target (swing → settle north)
+  const touchDial = rotaryOn() && !FINE.matches;
+  if (!touchDial && needle.idle) target = 2.5 * Math.sin(now/3200); // desktop: calm ambient drift
   let d = ((target - needle.cur + 540) % 360) - 180;     // shortest-path interpolation
-  needle.cur += d * (needle.idle ? 0.1 : 0.2);           // snappier when actively seeking
+  needle.cur += d * (needle.idle ? 0.1 : 0.2);           // snappier when actively seeking/dragging
   const el = $('#needle'); if (el) el.style.setProperty('--ndl', needle.cur.toFixed(2)+'deg');
   needle.raf = requestAnimationFrame(needleTick);
 }
@@ -249,6 +249,11 @@ function setDialRot(deg, drag){
   const host = $('#needs'); if (!host) return;
   host.style.setProperty('--rot', deg+'deg');
   host.classList.toggle('drag', !!drag);
+  // touch: the needle swings with the spin, then eases back to the north slot on release
+  if (rotaryOn() && !FINE.matches){
+    if (drag){ needle.target = -deg; needle.idle = false; needle.hold = performance.now() + 600; }
+    else { needle.target = 0; }
+  }
   const idx = ((Math.round(-deg/60)%6)+6)%6;
   if (idx !== rotary.idx){ rotary.idx = idx; paintActive(); }
 }
