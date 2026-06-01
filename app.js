@@ -193,16 +193,15 @@ function buildTicks(){
 
 /* needle: eased seek toward a target bearing; gentle idle wobble otherwise */
 const needle = { cur:0, target:0, idle:true, hold:0, raf:0 };
-function setNeedle(deg){ needle.target = deg; needle.idle = false; needle.hold = performance.now() + 2600; }
+function setNeedle(deg){ needle.target = deg; needle.idle = false; needle.hold = performance.now() + 3400; }
 function releaseNeedle(){ needle.hold = performance.now(); }
 function needleTick(now){
   if (!needle.idle && now > needle.hold) needle.idle = true;
   let target = needle.target;
-  if (rotaryOn()) target = 0;                            // mobile: needle pins to the north selection slot
-  else if (needle.idle) target = 9 * Math.sin(now/2100); // desktop: calm ±9° drift
-  // shortest-path interpolation
-  let d = ((target - needle.cur + 540) % 360) - 180;
-  needle.cur += d * 0.12;
+  if (rotaryOn() && !FINE.matches) target = 0;           // touch mobile: pin to the north selection slot
+  else if (needle.idle) target = 2.5 * Math.sin(now/3200); // calm ambient drift (won't mask a real seek)
+  let d = ((target - needle.cur + 540) % 360) - 180;     // shortest-path interpolation
+  needle.cur += d * (needle.idle ? 0.1 : 0.2);           // snappier when actively seeking
   const el = $('#needle'); if (el) el.style.setProperty('--ndl', needle.cur.toFixed(2)+'deg');
   needle.raf = requestAnimationFrame(needleTick);
 }
@@ -222,11 +221,11 @@ function buildNeeds(){
     const i = NEED_ORDER.indexOf(key);
     b.addEventListener('click', ()=>{ if (rotaryOn()){ dialTo(i); } else { choose(key,'manual'); } });
     if (FINE.matches){
-      b.addEventListener('pointerenter', ()=>{ if(!rotaryOn()){ lightNeed(key); setNeedle(NEED_BEARING[key]); } });
-      b.addEventListener('pointerleave', ()=>{ if(!rotaryOn()){ lightNeed(null); releaseNeedle(); } });
+      b.addEventListener('pointerenter', ()=>{ lightNeed(key); setNeedle(NEED_BEARING[key]); });
+      b.addEventListener('pointerleave', ()=>{ lightNeed(null); releaseNeedle(); });
     }
-    b.addEventListener('focus', ()=>{ if(!rotaryOn()){ lightNeed(key); setNeedle(NEED_BEARING[key]); } });
-    b.addEventListener('blur', ()=>{ if(!rotaryOn()){ lightNeed(null); releaseNeedle(); } });
+    b.addEventListener('focus', ()=>{ lightNeed(key); setNeedle(NEED_BEARING[key]); });
+    b.addEventListener('blur', ()=>{ lightNeed(null); releaseNeedle(); });
     host.appendChild(b);
   });
   positionNeeds();
@@ -265,8 +264,10 @@ function dialStep(d){ dialTo(((rotary.idx + d)%6+6)%6); }
 function moveThumb(){
   const seg = $('.seg'), thumb = $('.seg .thumb'); if (!seg||!thumb) return;
   const active = $(`.seg button[aria-pressed="true"]`); if (!active) return;
+  // offsetLeft is from the seg border box; the thumb sits at left:0 (padding box),
+  // so subtract the border width — RTL-safe, no auto-static-position surprises.
   thumb.style.width = active.offsetWidth+'px';
-  thumb.style.transform = `translateX(${active.offsetLeft - 4}px)`;
+  thumb.style.transform = `translateX(${active.offsetLeft - seg.clientLeft}px)`;
 }
 function applyLang(){
   root.lang = state.lang; root.dir = state.lang==='he'?'rtl':'ltr'; root.dataset.lang = state.lang;
@@ -490,8 +491,12 @@ function init(){
     stage.addEventListener('pointercancel', ()=>{ if(!dragging)return; dragging=false; setDialRot(Math.round(rotary.rot/60)*60); });
   }
   // initialise dial state
-  $('#needs').style.setProperty('--rot', rotaryOn() ? '0deg' : '0deg');
+  $('#needs').style.setProperty('--rot', '0deg');
   paintActive();
+
+  // lang-pill thumb: recompute once fonts settle (metrics change the button widths)
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveThumb);
+  addEventListener('load', moveThumb);
 
   // client logos: greyscale → colour on click (toggle)
   const logos = $('#logos');
